@@ -1,6 +1,6 @@
-package comp.trainticketserver.rmi;
+package comp.Rmi.rmi;
 
-import comp.trainticketserver.model.Tuyen;
+import comp.Rmi.model.Tuyen;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

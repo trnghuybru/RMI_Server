@@ -1,7 +1,9 @@
-package com;
+package comp;
 
-import com.trainticketserver.rmi.TuyenService;
-import com.trainticketserver.rmi.TuyenServiceImpl;
+import comp.Rmi.rmi.TrainService;
+import comp.Rmi.rmi.TrainServiceImpl;
+import comp.Rmi.rmi.TuyenService;
+import comp.Rmi.rmi.TuyenServiceImpl;
 
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
@@ -9,14 +11,16 @@ import java.rmi.registry.LocateRegistry;
 public class Main {
     public static void main(String[] args) {
         try {
-            // Tạo registry RMI trên cổng 1099
+
             LocateRegistry.createRegistry(1099);
 
-            // Đăng ký TuyenServiceImpl với RMI registry
+            TrainService trainService = new TrainServiceImpl();
             TuyenService tuyenService = new TuyenServiceImpl();
-            Naming.rebind("rmi://localhost:1099/TuyenService", tuyenService);
 
-            System.out.println("TuyenService is running...");
+            Naming.rebind("rmi://localhost:1099/TuyenService", tuyenService);
+            Naming.rebind("rmi://localhost:1099/TrainService", trainService);
+
+            System.out.println("Service is running...");
 
         } catch (Exception e) {
             e.printStackTrace();

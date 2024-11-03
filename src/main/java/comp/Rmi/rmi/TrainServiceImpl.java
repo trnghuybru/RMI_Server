@@ -1,7 +1,7 @@
-package comp.trainticketserver.rmi;
+package comp.Rmi.rmi;
 
 import comp.trainticketserver.DAO.TrainDAO;
-import comp.trainticketserver.model.Train;
+import comp.Rmi.model.Train;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;

@@ -1,4 +1,4 @@
-package comp.trainticketserver.model;
+package comp.Rmi.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
