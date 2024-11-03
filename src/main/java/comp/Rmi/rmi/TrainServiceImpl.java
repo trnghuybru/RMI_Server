@@ -16,7 +16,7 @@ public class TrainServiceImpl extends UnicastRemoteObject implements TrainServic
     }
 
     @Override
-    public List<Train> searchTrainsByTuyenId(Date departureDate, int departureStationId, int destinationStationId) throws RemoteException {
+    public List<Train> searchTrains(Date departureDate, int departureStationId, int destinationStationId) throws RemoteException {
         return trainDAO.searchTrains(departureDate, departureStationId, destinationStationId);
     }
 }

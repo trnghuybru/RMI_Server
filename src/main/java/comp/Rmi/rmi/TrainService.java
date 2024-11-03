@@ -8,5 +8,5 @@ import java.sql.Date;
 import java.util.List;
 
 public interface TrainService extends Remote {
-    List<Train> searchTrainsByTuyenId(Date departureDate, int departureStationId, int destinationStationId) throws RemoteException;
+    List<Train> searchTrains(Date departureDate, int departureStationId, int destinationStationId) throws RemoteException;
 }
