@@ -5,6 +5,7 @@ import comp.Rmi.model.Train;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.Date;
 import java.util.List;
 
 public class TrainServiceImpl extends UnicastRemoteObject implements TrainService {
@@ -15,7 +16,7 @@ public class TrainServiceImpl extends UnicastRemoteObject implements TrainServic
     }
 
     @Override
-    public List<Train> searchTrainsByTuyenId(int tuyenId, String ngayKhoiHanh) throws RemoteException {
-        return trainDAO.searchTrainsByTuyenId(tuyenId, ngayKhoiHanh);
+    public List<Train> searchTrainsByTuyenId(Date departureDate, int departureStationId, int destinationStationId) throws RemoteException {
+        return trainDAO.searchTrains(departureDate, departureStationId, destinationStationId);
     }
 }
