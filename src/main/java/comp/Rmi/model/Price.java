@@ -1,6 +1,8 @@
 package comp.Rmi.model;
 
-public class Price {
+import java.io.Serializable;
+
+public class Price implements Serializable {
     private int BangGiaID;
     private int TauID;
     private int GheID;

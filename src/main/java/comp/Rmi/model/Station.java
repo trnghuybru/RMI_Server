@@ -1,6 +1,8 @@
 package comp.Rmi.model;
 
-public class Station {
+import java.io.Serializable;
+
+public class Station implements Serializable {
     private int GaID;
     private String ten;
     private String diaChi;

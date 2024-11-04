@@ -18,4 +18,6 @@ public class SeatServiceImpl extends UnicastRemoteObject implements SeatService 
     public List<Seat> getAllSeats(int tauID ,int toaID) throws RemoteException {
         return seatDAO.getAllSeats(tauID,toaID);
     }
+
+
 }
