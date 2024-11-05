@@ -15,7 +15,7 @@ public class CarriageServiceImpl extends UnicastRemoteObject implements Carriage
     }
 
     @Override
-    public List<TrainCarriage> getCarriageByTrainID(int trainID ,int gaDi, int gaDen) throws RemoteException {
-        return toaDAO.getCarriageByTrainID(trainID, gaDi, gaDen);
+    public List<TrainCarriage> getCarriageByTrainID(int trainID ) throws RemoteException {
+        return toaDAO.getCarriageByTrainID(trainID);
     }
 }

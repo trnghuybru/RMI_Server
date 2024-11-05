@@ -1,6 +1,8 @@
 package comp.Rmi.model;
 
-public class Seat {
+import java.io.Serializable;
+
+public class Seat implements Serializable {
     private int gheID;
     private int soGhe;
     private int loaiGheID;

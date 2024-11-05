@@ -1,6 +1,8 @@
 package comp.Rmi.model;
 
-public class Carriage {
+import java.io.Serializable;
+
+public class Carriage implements Serializable {
     private int ToaID;
     private String TenToa;
 

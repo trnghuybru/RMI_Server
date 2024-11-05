@@ -1,6 +1,8 @@
 package comp.Rmi.model;
 
-public class TrainCarriage {
+import java.io.Serializable;
+
+public class TrainCarriage implements Serializable {
     private int TauToaID;
     private Train train;
     private Carriage carriage;
