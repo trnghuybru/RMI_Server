@@ -18,4 +18,11 @@ public class TicketServiceImpl extends UnicastRemoteObject implements TicketServ
     public boolean bookTicket(int gheID, int tauID, int gaDi, int gaDen, String tenKH, String diaChi, String sdt, float giaTien, int nhanVienID) throws RemoteException {
         return ticketDAO.bookTicket(gheID, tauID, gaDi, gaDen, tenKH, diaChi, sdt, giaTien, nhanVienID);
     }
+
+    @Override
+    public boolean cancelTicket(int hoaDonID, int gheID) throws RemoteException {
+        return ticketDAO.cancelTicket(hoaDonID,gheID);
+    }
+
+
 }

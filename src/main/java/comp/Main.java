@@ -27,30 +27,6 @@ public class Main {
 
             System.out.println("Service is running...");
 
-            // Khởi tạo đối tượng TicketDAO
-            TicketDAO ticketDAO = new TicketDAO();
-
-            // Thiết lập các tham số cần thiết cho việc đặt vé
-            int gheID = 1; // ID ghế
-            int tauID = 1; // ID tàu
-            int gaDi = 1;  // ID ga đi
-            int gaDen = 2; // ID ga đến
-            String tenKH = "Nguyen Van A"; // Tên khách hàng
-            String diaChi = "123 Nguyen Trai, TP.HCM"; // Địa chỉ khách hàng
-            String sdt = "0987654321"; // Số điện thoại khách hàng
-            float giaTien = 200000; // Giá tiền vé
-            int nhanVienID = 1; // ID nhân viên
-
-            // Gọi phương thức bookTicket để đặt vé
-            boolean isBooked = ticketDAO.bookTicket(gheID, tauID, gaDi, gaDen, tenKH, diaChi, sdt, giaTien, nhanVienID);
-
-            // Kiểm tra kết quả đặt vé
-            if (isBooked) {
-                System.out.println("Đặt vé thành công!");
-            } else {
-                System.out.println("Đặt vé không thành công.");
-            }
-
 
         } catch (Exception e) {
             e.printStackTrace();

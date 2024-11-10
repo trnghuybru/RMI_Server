@@ -98,4 +98,80 @@ public class TicketDAO {
 
         return isSuccess;
     }
+
+
+    public boolean cancelTicket(int hoaDonID, int gheID) {
+        boolean isCanceled = false;
+        Connection connection = null;
+
+        try {
+            connection = DatabaseConnection.getConnection();
+            connection.setAutoCommit(false); // Start transaction
+
+            // 1. Lock the ticket details in chitiethoadon for update
+            String sqlLockCTHD = "SELECT CTHDID FROM chitiethoadon WHERE HoaDonID = ? AND GheID = ? FOR UPDATE";
+            try (PreparedStatement psLockCTHD = connection.prepareStatement(sqlLockCTHD)) {
+                psLockCTHD.setInt(1, hoaDonID);
+                psLockCTHD.setInt(2, gheID);
+                ResultSet rs = psLockCTHD.executeQuery();
+
+                if (!rs.next()) {
+                    connection.rollback();
+                    return false; // Ticket not found
+                }
+
+                // 2. Delete from chitiethoadon
+                String sqlDeleteCTHD = "DELETE FROM chitiethoadon WHERE HoaDonID = ? AND GheID = ?";
+                try (PreparedStatement psDeleteCTHD = connection.prepareStatement(sqlDeleteCTHD)) {
+                    psDeleteCTHD.setInt(1, hoaDonID);
+                    psDeleteCTHD.setInt(2, gheID);
+                    int affectedRows = psDeleteCTHD.executeUpdate();
+
+                    if (affectedRows == 0) {
+                        connection.rollback();
+                        return false;
+                    }
+                }
+
+                // 3. Delete from hoadon if there are no remaining ticket details linked to it
+                String sqlCheckCTHD = "SELECT CTHDID FROM chitiethoadon WHERE HoaDonID = ?";
+                try (PreparedStatement psCheckCTHD = connection.prepareStatement(sqlCheckCTHD)) {
+                    psCheckCTHD.setInt(1, hoaDonID);
+                    rs = psCheckCTHD.executeQuery();
+
+                    if (!rs.next()) { // No remaining entries in chitiethoadon for this HoaDonID
+                        String sqlDeleteHoaDon = "DELETE FROM hoadon WHERE HoaDonID = ?";
+                        try (PreparedStatement psDeleteHoaDon = connection.prepareStatement(sqlDeleteHoaDon)) {
+                            psDeleteHoaDon.setInt(1, hoaDonID);
+                            psDeleteHoaDon.executeUpdate();
+                        }
+                    }
+                }
+            }
+
+            connection.commit();
+            isCanceled = true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return isCanceled;
+    }
+
 }
