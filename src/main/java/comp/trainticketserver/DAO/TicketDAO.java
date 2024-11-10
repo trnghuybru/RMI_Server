@@ -1,12 +1,14 @@
 package comp.trainticketserver.DAO;
 
+import comp.Rmi.model.CTHD;
+
 import java.sql.*;
 
 public class TicketDAO {
 
-    public boolean bookTicket(int gheID, int tauID, int gaDi, int gaDen, String tenKH, String diaChi, String sdt, float giaTien, int nhanVienID) {
-        boolean isSuccess = false;
+    public CTHD bookTicket(int gheID, int tauID, int gaDi, int gaDen, String tenKH, String diaChi, String sdt, float giaTien, int nhanVienID) {
         Connection connection = null;
+        CTHD cthd = null;
 
         try {
             // Kết nối với cơ sở dữ liệu
@@ -22,7 +24,7 @@ public class TicketDAO {
                 if (!rs.next()) {
                     // Nếu không tìm thấy ghế, không thể đặt vé
                     connection.rollback();
-                    return false;
+                    return null;
                 }
 
                 // 2. Thêm hóa đơn vào bảng hoadon
@@ -39,7 +41,7 @@ public class TicketDAO {
                     // Kiểm tra nếu không thêm được hóa đơn
                     if (affectedRows == 0) {
                         connection.rollback();
-                        return false;
+                        return null;
                     }
 
                     // Lấy ID của hóa đơn vừa thêm
@@ -50,7 +52,7 @@ public class TicketDAO {
 
                             // 3. Thêm chi tiết hóa đơn vào bảng chitiethoadon
                             String sqlInsertCTHD = "INSERT INTO chitiethoadon (GheID, TauID, GaDi, GaDen, HoaDonID, NgayKhoiHanh) VALUES (?, ?, ?, ?, ?, ?)";
-                            try (PreparedStatement psCTHD = connection.prepareStatement(sqlInsertCTHD)) {
+                            try (PreparedStatement psCTHD = connection.prepareStatement(sqlInsertCTHD, Statement.RETURN_GENERATED_KEYS)) {
                                 psCTHD.setInt(1, gheID);
                                 psCTHD.setInt(2, tauID);
                                 psCTHD.setInt(3, gaDi);
@@ -63,7 +65,22 @@ public class TicketDAO {
                                 // Kiểm tra nếu không thêm được chi tiết hóa đơn
                                 if (affectedRows == 0) {
                                     connection.rollback();
-                                    return false;
+                                    return null;
+                                }
+
+                                // Lấy ID của chi tiết hóa đơn vừa thêm và tạo đối tượng CTHD
+                                try (ResultSet rsCTHD = psCTHD.getGeneratedKeys()) {
+                                    if (rsCTHD.next()) {
+                                        int cthdID = rsCTHD.getInt(1);
+                                        cthd = new CTHD();
+                                        cthd.setCthdID(cthdID);
+                                        cthd.setGheID(gheID);
+                                        cthd.setTauID(tauID);
+                                        cthd.setGadiID(gaDi);
+                                        cthd.setGadenID(gaDen);
+                                        cthd.setHoadonID(hoaDonID);
+                                        cthd.setNgayKhoiHanh(new Date(System.currentTimeMillis()));
+                                    }
                                 }
                             }
                         }
@@ -73,7 +90,6 @@ public class TicketDAO {
 
             // Nếu tất cả các thao tác thành công, commit giao dịch
             connection.commit();
-            isSuccess = true;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -96,9 +112,8 @@ public class TicketDAO {
             }
         }
 
-        return isSuccess;
+        return cthd;
     }
-
 
     public boolean cancelTicket(int hoaDonID, int gheID) {
         boolean isCanceled = false;
@@ -174,4 +189,117 @@ public class TicketDAO {
         return isCanceled;
     }
 
+    public CTHD modifyTicket(int cthdID, int newGheID, int newTauID, int newGaDi, int newGaDen, Date newNgayKhoiHanh,
+                             String newTenKH, String newDiaChi, String newSDT, float newGiaTien, int newNhanVienID) {
+        Connection connection = null;
+        CTHD updatedCTHD = null;
+
+        try {
+            // Kết nối với cơ sở dữ liệu
+            connection = DatabaseConnection.getConnection();
+            connection.setAutoCommit(false); // Bắt đầu giao dịch
+
+            // 1. Khóa dòng chi tiết hóa đơn bằng SELECT FOR UPDATE
+            String sqlLockCTHD = "SELECT HoaDonID FROM chitiethoadon WHERE CTHDID = ? FOR UPDATE";
+            try (PreparedStatement psLock = connection.prepareStatement(sqlLockCTHD)) {
+                psLock.setInt(1, cthdID);
+                ResultSet rs = psLock.executeQuery();
+
+                if (!rs.next()) {
+                    // Nếu không tìm thấy chi tiết hóa đơn, không thể sửa vé
+                    connection.rollback();
+                    return null;
+                }
+
+                // Lấy ID của hóa đơn liên quan để cập nhật
+                int hoaDonID = rs.getInt("HoaDonID");
+
+                // 2. Cập nhật hóa đơn trong bảng hoadon
+                String sqlUpdateHoaDon = "UPDATE hoadon SET TenKH = ?, DiaChi = ?, SDT = ?, NhanVienID = ?, SoTien = ? WHERE HoaDonID = ?";
+                try (PreparedStatement psUpdateHoaDon = connection.prepareStatement(sqlUpdateHoaDon)) {
+                    psUpdateHoaDon.setString(1, newTenKH);
+                    psUpdateHoaDon.setString(2, newDiaChi);
+                    psUpdateHoaDon.setString(3, newSDT);
+                    psUpdateHoaDon.setInt(4, newNhanVienID);
+                    psUpdateHoaDon.setFloat(5, newGiaTien);
+                    psUpdateHoaDon.setInt(6, hoaDonID);
+
+                    int affectedRows = psUpdateHoaDon.executeUpdate();
+
+                    // Kiểm tra nếu không cập nhật được hóa đơn
+                    if (affectedRows == 0) {
+                        connection.rollback();
+                        return null;
+                    }
+                }
+
+                String sqlUpdateCTHD = "UPDATE chitiethoadon SET GheID = ?, TauID = ?, GaDi = ?, GaDen = ?, NgayKhoiHanh = ? WHERE CTHDID = ?";
+                int affectedRows = 0;  // Declare the variable here
+
+                try (PreparedStatement psUpdateCTHD = connection.prepareStatement(sqlUpdateCTHD)) {
+                    psUpdateCTHD.setInt(1, newGheID);
+                    psUpdateCTHD.setInt(2, newTauID);
+                    psUpdateCTHD.setInt(3, newGaDi);
+                    psUpdateCTHD.setInt(4, newGaDen);
+
+                    // Kiểm tra nếu ngày khởi hành là null
+                    if (newNgayKhoiHanh != null) {
+                        psUpdateCTHD.setDate(5, newNgayKhoiHanh);
+                    } else {
+                        psUpdateCTHD.setNull(5, Types.DATE);
+                    }
+
+                    psUpdateCTHD.setInt(6, cthdID);
+
+                    affectedRows = psUpdateCTHD.executeUpdate(); // Now we can use affectedRows
+
+                    // Kiểm tra nếu không cập nhật được chi tiết hóa đơn
+                    if (affectedRows == 0) {
+                        connection.rollback();
+                        System.out.println("Không tìm thấy hoặc không cập nhật được chi tiết hóa đơn với ID: " + cthdID);
+                        return null;  // Returning null if no rows were updated
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    connection.rollback();
+                    throw new SQLException("Lỗi khi cập nhật chi tiết hóa đơn: " + e.getMessage());
+                }
+
+                // 4. Tạo đối tượng CTHD với các thông tin đã cập nhật
+                updatedCTHD = new CTHD();
+                updatedCTHD.setCthdID(cthdID);
+                updatedCTHD.setGheID(newGheID);
+                updatedCTHD.setTauID(newTauID);
+                updatedCTHD.setGadiID(newGaDi);
+                updatedCTHD.setGadenID(newGaDen);
+                updatedCTHD.setHoadonID(hoaDonID);
+                updatedCTHD.setNgayKhoiHanh(newNgayKhoiHanh);
+            }
+
+            // Nếu tất cả các thao tác thành công, commit giao dịch
+            connection.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Xử lý rollback trong trường hợp có lỗi
+            if (connection != null) {
+                try {
+                    connection.rollback(); // Rollback nếu có lỗi
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+        } finally {
+            // Đảm bảo đóng kết nối
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return updatedCTHD;
+    }
 }
