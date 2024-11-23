@@ -1,5 +1,6 @@
 package comp.Rmi.rmi;
 
+import comp.Rmi.model.CTHDDetailsDTO;
 import comp.Rmi.model.HoaDon;
 import comp.trainticketserver.DAO.HoaDonDAO;
 import comp.trainticketserver.DAO.PriceDAO;
@@ -23,5 +24,10 @@ public class HoaDonServiceImpl extends UnicastRemoteObject implements HoaDonServ
     @Override
     public HoaDon findHoaDonByID(int hoadonID) throws RemoteException {
         return hoaDonDAO.findHoaDonByID(hoadonID);
+    }
+
+    @Override
+    public List<CTHDDetailsDTO> getHoaDonDetailsByNhanVienID(int nhanVienID) throws RemoteException {
+        return hoaDonDAO.getHoaDonDetailsByNhanVienID(nhanVienID);
     }
 }

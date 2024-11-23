@@ -1,5 +1,6 @@
 package comp.Rmi.rmi;
 
+import comp.Rmi.model.NhanVien;
 import comp.trainticketserver.DAO.NhanVienDAO;
 
 import java.rmi.RemoteException;
@@ -13,7 +14,7 @@ public class LoginServiceImpl extends UnicastRemoteObject implements LoginServic
     }
 
     @Override
-    public boolean login(String email, String password) throws RemoteException {
+    public NhanVien login(String email, String password) throws RemoteException {
         return nhanVienDAO.login(email, password);
     }
 }
