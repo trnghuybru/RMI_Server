@@ -1,5 +1,6 @@
 package comp.Rmi.rmi;
 
+import comp.trainticketserver.DAO.AdminDAO;
 import comp.trainticketserver.DAO.TrainDAO;
 import comp.Rmi.model.Train;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 public class TrainServiceImpl extends UnicastRemoteObject implements TrainService {
     private TrainDAO trainDAO;
+    private AdminDAO adminDAO;
 
     public TrainServiceImpl() throws RemoteException {
         trainDAO = new TrainDAO();
@@ -23,6 +25,11 @@ public class TrainServiceImpl extends UnicastRemoteObject implements TrainServic
     @Override
     public List<Train> getAllTrains() throws RemoteException {
         return trainDAO.getAllTrains();
+    }
+
+    @Override
+    public boolean themTauVaGioTau(int tuyenID, String tenTau, int gaDi, int gaDen, String gioDi, String gioDen) throws RemoteException {
+        return adminDAO.themTauVaGioTau(tuyenID, tenTau, gaDi, gaDen, gioDi, gioDen);
     }
 
 

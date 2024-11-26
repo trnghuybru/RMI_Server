@@ -79,27 +79,5 @@ public class TrainDAO {
         return trainList;
     }
 
-    // Method to add a new train
-    public boolean addTrain(Train train) {
-        String sql = "INSERT INTO tau (TenTau) VALUES (?)";
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setString(1, train.getTenTau());
-            int affectedRows = ps.executeUpdate();
-
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        train.setTauID(generatedKeys.getInt(1));
-                        return true;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 }
