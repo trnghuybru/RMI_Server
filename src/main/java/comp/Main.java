@@ -29,6 +29,7 @@ public class Main {
             LoginService loginService = new LoginServiceImpl();
             TicketService ticketService = new TicketServiceImpl();
             TuyenService tuyenService = new TuyenServiceImpl();
+            StatictisService statictisService = new StatictisServiceImpl();
 
             Naming.rebind("rmi://localhost:1099/TrainService", trainService);
             Naming.rebind("rmi://localhost:1099/CarriageService", carriageService);
@@ -39,29 +40,9 @@ public class Main {
             Naming.rebind("rmi://localhost:1099/LoginService", loginService);
             Naming.rebind("rmi://localhost:1099/TicketService", ticketService);
             Naming.rebind("rmi://localhost:1099/TuyenService", tuyenService);
+            Naming.rebind("rmi://localhost:1099/StatictisService", statictisService);
 
             System.out.println("Service is running...");
-
-            AdminDAO adminDAO = new AdminDAO();
-
-            // Tạo danh sách toa và giá tiền
-            List<Map.Entry<Integer, Double>> toaPriceList = new ArrayList<>();
-            toaPriceList.add(new AbstractMap.SimpleEntry<>(1, 150.0));  // ToaID = 1, giá tiền = 150.0
-            toaPriceList.add(new AbstractMap.SimpleEntry<>(2, 200.0));  // ToaID = 2, giá tiền = 200.0
-            toaPriceList.add(new AbstractMap.SimpleEntry<>(3, 250.0));  // ToaID = 3, giá tiền = 250.0
-
-            // Các thông tin tàu và ga
-            int tauID = 8;    // Giả sử ID của tàu là 123
-            int gaDi = 1;       // Ga đi (ID)
-            int gaDen = 2;      // Ga đến (ID)
-
-            try {
-                // Gọi phương thức để thêm giá tiền vào bảng 'banggia'
-                adminDAO.themGiaTien(tauID, toaPriceList, gaDi, gaDen);
-                System.out.println("Dữ liệu đã được chèn vào bảng banggia thành công!");
-            } catch (SQLException e) {
-                System.err.println("Có lỗi khi thêm dữ liệu vào bảng banggia: " + e.getMessage());
-            }
 
         } catch (Exception e) {
             e.printStackTrace();
