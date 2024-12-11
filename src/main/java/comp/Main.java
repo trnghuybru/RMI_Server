@@ -44,6 +44,9 @@ public class Main {
 
             System.out.println("Service is running...");
 
+            TicketDAO ticketDAO = new TicketDAO();
+            ticketDAO.cancelTicket(2,70);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
